@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="960" height="300" role="img" aria-labelledby="t d">
+  <title id="t">Roadmap: nine phases from setup to capstone</title>
+  <desc id="d">A path of nine numbered stops: 0 setup, 1 foundations, 2 workflow, 3 containers, 4 CI/CD, 5 Kubernetes, IaC and cloud, 6 reliability, 7 security and AI, 8 capstone. The phase estimates add up to 17 to 25 weeks at about ten hours a week.</desc>
+  <defs>
+    <linearGradient id="path" x1="0" x2="1">
+      <stop offset="0" stop-color="#3ddc97"/>
+      <stop offset="0.55" stop-color="#7cc4ff"/>
+      <stop offset="1" stop-color="#ffb547"/>
+    </linearGradient>
+    <style>
+      .bg { fill: #0f1418; }
+      .line { fill: none; stroke: url(#path); stroke-width: 6; stroke-linecap: round; }
+      .dot { fill: #0f1418; stroke-width: 4; }
+      .num { font: 700 16px ui-monospace, "SF Mono", Consolas, monospace; fill: #e7edf2; text-anchor: middle; }
+      .name { font: 700 13px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e7edf2; text-anchor: middle; }
+      .time { font: 11px ui-monospace, "SF Mono", Consolas, monospace; fill: #8a9aa8; text-anchor: middle; }
+      .title { font: 700 18px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #e7edf2; }
+      .sub { font: 12px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #8a9aa8; }
+    </style>
+  </defs>
+  <rect class="bg" width="960" height="300" rx="16"/>
+  <text class="title" x="32" y="40">From laptop to production, in nine phases</text>
+  <text class="sub" x="32" y="60">17–25 weeks at ~10 h/week · every phase ships a lesson, labs, Python tools and a self-check</text>
+
+  <path class="line" d="M70,170 C150,110 210,110 280,170 S410,230 490,170 S620,110 700,170 S830,230 890,170"/>
+
+  <g>
+    <circle class="dot" cx="70" cy="170" r="20" stroke="#3ddc97"/><text class="num" x="70" y="176">0</text>
+    <text class="name" x="70" y="222">Setup</text><text class="time" x="70" y="240">1–2 h</text>
+  </g>
+  <g>
+    <circle class="dot" cx="172" cy="128" r="20" stroke="#3ddc97"/><text class="num" x="172" y="134">1</text>
+    <text class="name" x="172" y="92">Foundations</text><text class="time" x="172" y="76">2–3 wk</text>
+  </g>
+  <g>
+    <circle class="dot" cx="280" cy="170" r="20" stroke="#4fd6a8"/><text class="num" x="280" y="176">2</text>
+    <text class="name" x="280" y="222">Workflow</text><text class="time" x="280" y="240">1–2 wk</text>
+  </g>
+  <g>
+    <circle class="dot" cx="385" cy="212" r="20" stroke="#5fd0b8"/><text class="num" x="385" y="218">3</text>
+    <text class="name" x="385" y="262">Containers</text><text class="time" x="385" y="280">1–2 wk</text>
+  </g>
+  <g>
+    <circle class="dot" cx="490" cy="170" r="20" stroke="#6fcad8"/><text class="num" x="490" y="176">4</text>
+    <text class="name" x="490" y="134">CI/CD</text><text class="time" x="490" y="118">2 wk</text>
+  </g>
+  <g>
+    <circle class="dot" cx="595" cy="128" r="20" stroke="#7cc4ff"/><text class="num" x="595" y="134">5</text>
+    <text class="name" x="595" y="92">Kubernetes · IaC · Cloud</text><text class="time" x="595" y="76">4–6 wk</text>
+  </g>
+  <g>
+    <circle class="dot" cx="700" cy="170" r="20" stroke="#a9bfd0"/><text class="num" x="700" y="176">6</text>
+    <text class="name" x="700" y="222">Reliability</text><text class="time" x="700" y="240">2–3 wk</text>
+  </g>
+  <g>
+    <circle class="dot" cx="795" cy="208" r="20" stroke="#d9b47a"/><text class="num" x="795" y="214">7</text>
+    <text class="name" x="795" y="258">Security · AI</text><text class="time" x="795" y="276">2–3 wk</text>
+  </g>
+  <g>
+    <circle class="dot" cx="890" cy="170" r="22" stroke="#ffb547"/><text class="num" x="890" y="176">8</text>
+    <text class="name" x="890" y="134">Capstone</text><text class="time" x="890" y="118">3–4 wk</text>
+  </g>
+</svg>

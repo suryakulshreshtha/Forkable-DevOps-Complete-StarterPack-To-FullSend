@@ -1,0 +1,11 @@
+# Keeps at least one pod running during voluntary disruptions (node drains, upgrades).
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fullsend
+  namespace: fullsend
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fullsend

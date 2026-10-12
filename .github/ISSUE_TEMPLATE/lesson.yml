@@ -1,0 +1,17 @@
+name: Lesson improvement
+description: Suggest a clearer explanation, a missing step, or an outdated version.
+labels: ["lesson"]
+body:
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggestion
+      description: If a version or fact is outdated, link the official source that shows the current one.
+    validations:
+      required: true

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "ci-triage": {
+      "command": "/absolute/path/to/Forkable-DevOps-Complete-StarterPack-To-FullSend/.venv/bin/ci-triage-mcp",
+      "env": {
+        "GITHUB_TOKEN": "replace-with-a-fine-grained-read-only-token"
+      }
+    }
+  }
+}

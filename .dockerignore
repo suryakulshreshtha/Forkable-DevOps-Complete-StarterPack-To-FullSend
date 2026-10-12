@@ -1,0 +1,9 @@
+# Send the Docker daemon only what the image needs.
+*
+!pyproject.toml
+!README.md
+!LICENSE
+!NOTICE
+!src/
+**/__pycache__
+**/*.pyc

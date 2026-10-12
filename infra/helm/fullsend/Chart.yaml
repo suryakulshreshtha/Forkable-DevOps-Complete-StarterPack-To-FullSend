@@ -1,0 +1,8 @@
+apiVersion: v2
+name: fullsend
+description: FullSend deployment log service (practice app for the Forkable DevOps StarterPack)
+type: application
+version: 0.1.0        # chart version: bump when the chart changes
+appVersion: "1.0.0"   # app version: the image tag deployed by default
+kubeVersion: ">=1.30.0-0"   # preStop "sleep" needs 1.30 or newer
+home: https://github.com/YOUR-GITHUB-USER/Forkable-DevOps-Complete-StarterPack-To-FullSend

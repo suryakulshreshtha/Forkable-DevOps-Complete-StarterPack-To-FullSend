@@ -1,0 +1,26 @@
+# Dependabot opens pull requests when pinned versions have updates, so exact
+# pins (and action commit SHAs) stay current without anyone remembering.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      python:
+        patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+  - package-ecosystem: terraform
+    directory: "/infra/terraform/aws-eks"
+    schedule:
+      interval: weekly

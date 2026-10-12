@@ -1,0 +1,78 @@
+# SLO: 99% of /api requests succeed (non-5xx), measured over 30 days.
+# Error budget = 1 - 0.99 = 0.01. Burn-rate thresholds (14.4, 6, 1) and window
+# pairs follow the multiwindow, multi-burn-rate method in the Google SRE Workbook,
+# chapter "Alerting on SLOs".
+groups:
+  - name: fullsend-sli
+    interval: 30s
+    rules:
+      - record: fullsend:api_error_ratio:rate5m
+        expr: |
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*", status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*"}[5m]))
+      - record: fullsend:api_error_ratio:rate30m
+        expr: |
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*", status=~"5.."}[30m]))
+          /
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*"}[30m]))
+      - record: fullsend:api_error_ratio:rate1h
+        expr: |
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*", status=~"5.."}[1h]))
+          /
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*"}[1h]))
+      - record: fullsend:api_error_ratio:rate6h
+        expr: |
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*", status=~"5.."}[6h]))
+          /
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*"}[6h]))
+      - record: fullsend:api_error_ratio:rate3d
+        expr: |
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*", status=~"5.."}[3d]))
+          /
+          sum(rate(http_requests_total{job="fullsend", route=~"/api/.*"}[3d]))
+      - record: fullsend:api_latency_p95:5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="fullsend", route=~"/api/.*"}[5m])))
+
+  - name: fullsend-alerts
+    rules:
+      - alert: FullSendErrorBudgetFastBurn
+        expr: |
+          (fullsend:api_error_ratio:rate1h > (14.4 * 0.01) and fullsend:api_error_ratio:rate5m > (14.4 * 0.01))
+          or
+          (fullsend:api_error_ratio:rate6h > (6 * 0.01) and fullsend:api_error_ratio:rate30m > (6 * 0.01))
+        labels:
+          severity: page
+        annotations:
+          summary: FullSend is burning its error budget fast
+          description: At this rate the 30-day error budget is gone in about two days or less.
+          runbook: observability/RUNBOOK.md#fullsenderrorbudgetfastburn
+
+      - alert: FullSendErrorBudgetSlowBurn
+        expr: |
+          fullsend:api_error_ratio:rate3d > (1 * 0.01) and fullsend:api_error_ratio:rate6h > (1 * 0.01)
+        labels:
+          severity: ticket
+        annotations:
+          summary: FullSend is slowly using up its error budget
+          runbook: observability/RUNBOOK.md#fullsenderrorbudgetslowburn
+
+      - alert: FullSendDown
+        expr: up{job="fullsend"} == 0
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: Prometheus cannot scrape FullSend
+          runbook: observability/RUNBOOK.md#fullsenddown
+
+      - alert: FullSendSlowResponses
+        expr: fullsend:api_latency_p95:5m > 0.25
+        for: 10m
+        labels:
+          severity: ticket
+        annotations:
+          summary: 95th percentile API latency is above 250 ms
+          runbook: observability/RUNBOOK.md#fullsendslowresponses

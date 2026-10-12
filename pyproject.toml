@@ -1,0 +1,144 @@
+# Packaging and tool configuration for the whole starter pack.
+# Every version below was checked against PyPI on 2026-10-12 (see VERSIONS.md).
+# Dependabot (".github/dependabot.yml") opens pull requests when new versions ship.
+
+[build-system]
+requires = ["setuptools>=84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fullsend"
+version = "1.0.0"
+description = "Practice service for the Forkable DevOps StarterPack: records deployments and reports delivery stats."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.12"
+authors = [{ name = "Surya Kulshreshtha" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Framework :: FastAPI",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "fastapi==0.143.0",
+  "uvicorn==0.54.0",
+  "prometheus-client==0.26.0",
+]
+
+[project.optional-dependencies]
+# Tools for writing, linting and testing code.
+dev = [
+  "pytest==9.1.1",
+  "pytest-cov==7.1.0",
+  "httpx==0.28.1",
+  "ruff==0.17.0",
+  "mypy==2.4.0",
+  "pyyaml==6.0.3",
+  "jsonschema==4.26.0",
+]
+# Browser end-to-end tests (QA track). Browsers install separately:
+#   python -m playwright install chromium
+e2e = [
+  "pytest-playwright==0.10.0",
+  "playwright==1.63.0",
+]
+# Distributed tracing with OpenTelemetry (phase 06).
+observability = [
+  "opentelemetry-api==1.45.1",
+  "opentelemetry-sdk==1.45.1",
+  "opentelemetry-exporter-otlp-proto-http==1.45.1",
+  "opentelemetry-instrumentation-fastapi==0.66b1",
+]
+# Dependency and code security scanners (phase 07).
+security = [
+  "pip-audit==2.10.1",
+  "bandit==1.9.4",
+]
+# The CI triage agent built on the Model Context Protocol (phase 07).
+agent = [
+  "mcp==2.3.0",
+]
+# Everything above, for the dev container and `python tasks.py setup`.
+all = [
+  "fullsend[dev,e2e,observability,security,agent]",
+]
+
+[project.scripts]
+fullsend = "fullsend.__main__:main"
+ci-triage-mcp = "ci_triage.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+fullsend = ["static/*"]
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "scripts", "tests"]
+
+[tool.ruff.lint]
+# E/W pycodestyle, F pyflakes, I import order, B bugbear, UP pyupgrade,
+# S bandit security rules, SIM simplifications, PT pytest style, RUF ruff-specific.
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "PT", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests and lab self-checks use assert and seeded randomness by design.
+"tests/**" = ["S101", "S311"]
+"**/test_*.py" = ["S101", "S311"]
+"**/check_phase*.py" = ["S101", "S311"]
+# The task runner, helper scripts and lab tools call trusted local programs (S603/S607)
+# and open URLs the operator passes on the command line (S310), on purpose.
+"tasks.py" = ["S603", "S607"]
+"scripts/**" = ["S603", "S607", "S310"]
+"phases/**" = ["S603", "S607", "S310"]
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+mypy_path = ["src"]
+files = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["yaml", "yaml.*", "opentelemetry.*", "mcp.*"]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+minversion = "9.0"
+# tests/ holds the app's tests; scripts/ and phases/ hold tests for the tooling and
+# the self-check files learners run after each phase (check_phase*.py).
+testpaths = ["tests", "scripts", "phases"]
+python_files = ["test_*.py", "check_*.py"]
+pythonpath = ["src", "scripts"]
+addopts = "-ra --strict-markers --strict-config -m \"not e2e\""
+markers = [
+  "e2e: browser end-to-end tests that need Playwright browsers (run: python tasks.py e2e)",
+  "agent: tests for the MCP triage agent (need the 'agent' extra)",
+]
+# Treat warnings as errors so problems surface early, the same way CI sees them.
+filterwarnings = [
+  "error",
+]
+
+# ---------------------------------------------------------------- coverage
+[tool.coverage.run]
+branch = true
+source = ["fullsend", "ci_triage"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_also = [
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]

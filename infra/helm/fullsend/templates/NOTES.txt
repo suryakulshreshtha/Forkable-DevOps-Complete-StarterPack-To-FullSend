@@ -1,0 +1,8 @@
+FullSend {{ .Chart.AppVersion }} is installed as release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+
+Open it locally:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "fullsend.fullname" . }} 8080:{{ .Values.service.port }}
+  then browse to http://127.0.0.1:8080
+
+Watch the rollout:
+  kubectl -n {{ .Release.Namespace }} rollout status deploy/{{ include "fullsend.fullname" . }}

@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# Tool caches and reports
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+reports/
+test-results/
+
+# Terraform: state and secrets must never be committed
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+.terraform.tfstate.lock.info
+# The provider lock file IS committed in real projects; it is generated on first init.
+
+# Local environment and editor files
+.env
+.env.*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Rendered Helm output
+rendered*.yaml

@@ -1,0 +1,32 @@
+# `helm test <release>` runs this pod; it passes when the service answers /healthz/ready.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "fullsend.fullname" . }}-test"
+  labels:
+    {{- include "fullsend.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: probe
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      command:
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen("http://{{ include "fullsend.fullname" . }}:{{ .Values.service.port }}/healthz/ready", timeout=5)
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]

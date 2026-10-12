@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FullSend Deploy Log</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <p class="eyebrow">Forkable DevOps StarterPack</p>
+      <h1>FullSend Deploy Log</h1>
+      <p class="lede">Record every deployment. Watch your change fail rate.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section aria-labelledby="stats-heading" class="panel">
+      <h2 id="stats-heading">Delivery metrics</h2>
+      <div class="stats" id="stats">
+        <article class="stat">
+          <h3>Deployments, last 30 days</h3>
+          <p class="stat-value" data-stat="total">0</p>
+        </article>
+        <article class="stat">
+          <h3>Production change fail rate</h3>
+          <p class="stat-value" data-stat="production-cfr">0%</p>
+        </article>
+        <article class="stat">
+          <h3>Production recovery time (median)</h3>
+          <p class="stat-value" data-stat="production-recovery">n/a</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="form-heading" class="panel">
+      <h2 id="form-heading">Record a deployment</h2>
+      <form id="deploy-form" novalidate>
+        <div class="grid">
+          <label>Service
+            <input name="service" type="text" required maxlength="63" autocomplete="off"
+                   placeholder="checkout-api" pattern="[a-z0-9]([a-z0-9-]*[a-z0-9])?">
+          </label>
+          <label>Version
+            <input name="version" type="text" required maxlength="64" autocomplete="off" placeholder="1.4.2">
+          </label>
+          <label>Environment
+            <select name="environment" required>
+              <option value="dev">dev</option>
+              <option value="staging">staging</option>
+              <option value="production">production</option>
+            </select>
+          </label>
+          <label>Outcome
+            <select name="status">
+              <option value="succeeded">succeeded</option>
+              <option value="failed">failed</option>
+              <option value="rolled_back">rolled_back</option>
+            </select>
+          </label>
+          <label>Commit SHA <span class="hint">(optional)</span>
+            <input name="commit_sha" type="text" maxlength="40" autocomplete="off" placeholder="a1b2c3d">
+          </label>
+        </div>
+        <button type="submit">Record deployment</button>
+        <p id="form-status" role="status" aria-live="polite" class="note"></p>
+        <p id="form-error" role="alert" class="error"></p>
+      </form>
+    </section>
+
+    <section aria-labelledby="table-heading" class="panel">
+      <h2 id="table-heading">Recent deployments</h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Service</th>
+              <th scope="col">Version</th>
+              <th scope="col">Environment</th>
+              <th scope="col">Outcome</th>
+              <th scope="col">Commit</th>
+              <th scope="col">Recorded (UTC)</th>
+            </tr>
+          </thead>
+          <tbody id="deployments"></tbody>
+        </table>
+      </div>
+      <p id="empty" class="note">No deployments yet.</p>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <a href="/docs">API docs</a> · <a href="/metrics">Metrics</a> · <a href="/version">Version</a>
+  </footer>
+</body>
+</html>

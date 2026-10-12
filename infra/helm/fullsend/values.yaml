@@ -1,0 +1,37 @@
+# Defaults for the FullSend chart. Override per environment with -f or --set.
+
+replicaCount: 2
+
+image:
+  repository: fullsend          # e.g. ghcr.io/<owner>/fullsend when pulling from GHCR
+  tag: ""                       # defaults to the chart appVersion
+  pullPolicy: IfNotPresent
+
+app:
+  environment: dev
+  chaosErrorRate: "0"           # 0 to 1; raise it during the reliability lab
+  otelEnabled: "false"
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+autoscaling:
+  enabled: false                # needs Metrics Server in the cluster
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: true

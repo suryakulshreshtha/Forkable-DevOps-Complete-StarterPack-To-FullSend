@@ -1,0 +1,102 @@
+# Validates infrastructure code and proves the app deploys to a real (throwaway)
+# Kubernetes cluster on every change. Nothing here touches a cloud account.
+name: Infrastructure
+
+on:
+  push:
+    branches: [main]
+    paths: ["infra/**", "src/**", "Dockerfile", "scripts/**", ".github/workflows/infra.yml"]
+  pull_request:
+    paths: ["infra/**", "src/**", "Dockerfile", "scripts/**", ".github/workflows/infra.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: infra-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  terraform:
+    name: Terraform fmt and validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: infra/terraform/aws-eks
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.16.5
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false -input=false
+      - run: terraform validate
+
+  manifests:
+    name: Helm lint and schema-validate rendered manifests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v4.3.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - run: python -m pip install "pyyaml==6.0.3" "jsonschema==4.26.0"
+      - run: helm lint infra/helm/fullsend --strict
+      - name: Render the chart (default values and autoscaling on)
+        run: |
+          helm template demo infra/helm/fullsend > rendered-default.yaml
+          helm template demo infra/helm/fullsend --set autoscaling.enabled=true > rendered-hpa.yaml
+      - name: Validate against the Kubernetes API schema
+        run: python scripts/validate_k8s.py rendered-default.yaml rendered-hpa.yaml infra/k8s
+
+  kind:
+    name: Deploy to kind and smoke test
+    needs: [manifests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build the image
+        run: docker build --build-arg GIT_SHA=${{ github.sha }} -t fullsend:dev .
+      - name: Create a kind cluster (same config as the local lab)
+        uses: helm/kind-action@1544676c07bb3570fcb70166beaa07c4528fd4aa # v1.15.1
+        with:
+          version: v0.33.0
+          cluster_name: fullsend
+          config: infra/kind/kind-config.yaml
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v4.3.0
+      - name: Load the image into the cluster nodes
+        run: kind load docker-image fullsend:dev --name fullsend
+      - name: Deploy the plain manifests
+        run: |
+          kubectl apply -k infra/k8s
+          kubectl -n fullsend rollout status deploy/fullsend --timeout=180s
+      - name: Smoke test through a port-forward
+        run: |
+          kubectl -n fullsend port-forward svc/fullsend 8080:80 &
+          python3 scripts/smoke_test.py http://127.0.0.1:8080
+      - name: Deploy the Helm chart and run its test hook
+        run: |
+          helm install demo infra/helm/fullsend --namespace helm-demo --create-namespace \
+            --set image.tag=dev --wait --timeout 3m
+          helm test demo --namespace helm-demo
+      - name: Show cluster state when something failed
+        if: failure()
+        run: |
+          kubectl get all -A
+          kubectl -n fullsend describe pods
+          kubectl -n fullsend logs deploy/fullsend --tail=100 || true

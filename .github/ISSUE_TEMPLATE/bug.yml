@@ -1,0 +1,37 @@
+name: Bug or broken lab step
+description: Something in the code or a lesson does not work as written.
+labels: ["bug"]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: Lesson file or code path, for example phases/03-containers/README.md
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: ["macOS", "Windows", "Linux", "GitHub Actions"]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What you ran
+      description: Exact commands, in order.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      description: Output of `python --version`, plus docker / kubectl / helm / terraform versions if relevant.
