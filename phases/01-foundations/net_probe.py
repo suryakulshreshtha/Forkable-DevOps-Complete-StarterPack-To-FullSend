@@ -81,6 +81,7 @@ def http(url: str, timeout: float) -> Step:
             status = res.status
     except urllib.error.HTTPError as exc:
         status = exc.code
+        exc.close()  # Python 3.14 warns about an error response left open
     except (urllib.error.URLError, OSError) as exc:
         return Step("HTTP", False, f"request failed: {exc}", _ms(start))
     return Step("HTTP", status < 500, f"{url} -> {status}", _ms(start))

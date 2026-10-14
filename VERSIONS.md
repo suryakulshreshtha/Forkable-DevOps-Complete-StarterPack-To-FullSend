@@ -23,6 +23,7 @@ for Python packages, GitHub Actions, the Docker base image and Terraform provide
 | prometheus-client | 0.26.0 | app |
 | pytest · pytest-cov | 9.1.1 · 7.1.0 | dev |
 | httpx | 0.28.1 | dev |
+| httpx2 | 2.13.1 | dev (the Starlette test client uses it; without it the client warns, and warnings are errors here) |
 | ruff · mypy | 0.17.0 · 2.4.0 | dev |
 | pyyaml · jsonschema | 6.0.3 · 4.26.0 | dev |
 | playwright · pytest-playwright | 1.63.0 · 0.10.0 | e2e |

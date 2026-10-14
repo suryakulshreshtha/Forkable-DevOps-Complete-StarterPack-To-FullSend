@@ -27,7 +27,8 @@ def request(url: str, method: str = "GET", body: dict[str, Any] | None = None) -
         with urllib.request.urlopen(req, timeout=5) as res:  # nosec B310  # URL given by the operator
             return res.status, res.read().decode()
     except urllib.error.HTTPError as exc:
-        return exc.code, exc.read().decode()
+        with exc:  # close the error response; Python 3.14 warns about one left open
+            return exc.code, exc.read().decode()
 
 
 def wait_until_ready(base: str, timeout: float) -> bool:

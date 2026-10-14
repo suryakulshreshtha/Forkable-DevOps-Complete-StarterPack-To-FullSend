@@ -34,7 +34,10 @@ RUN groupadd --system --gid 10001 app \
  && useradd --system --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app
 
 COPY --from=build /wheels /wheels
+# pip is only needed for this install. Its bundled copies of urllib3, msgpack and
+# setuptools are what the image scan flagged, and nothing in the image runs pip afterwards.
 RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels fullsend \
+ && python -m pip uninstall --yes pip \
  && rm -rf /wheels
 
 USER 10001:10001
