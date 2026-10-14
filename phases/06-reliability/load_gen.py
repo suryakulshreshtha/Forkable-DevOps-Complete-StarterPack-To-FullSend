@@ -59,6 +59,7 @@ def one_request(base: str, rng: random.Random) -> tuple[int, float]:
             status = res.status
     except urllib.error.HTTPError as exc:
         status = exc.code
+        exc.close()  # Python 3.14 warns about an error response left open
     except (urllib.error.URLError, OSError):
         status = 0  # connection failure
     return status, time.perf_counter() - start

@@ -258,6 +258,7 @@ def check_external(urls: dict[str, list[str]]) -> tuple[list[str], list[str]]:
                 status = res.status
         except urllib.error.HTTPError as exc:
             status = exc.code
+            exc.close()  # Python 3.14 warns about an error response left open
         except (urllib.error.URLError, TimeoutError) as exc:
             warnings.append(f"{url} unreachable ({exc}) in {where[0]}")
             continue
