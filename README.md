@@ -1,3 +1,7 @@
+<!-- forkable-card:start (added by apply_cards.py; re-run it to update) -->
+![DevOps, Starter Pack to Full Send: build, ship and run one real Python service, from your laptop to Kubernetes](.github/assets/forkable-card.png)
+<!-- forkable-card:end -->
+
 # Forkable DevOps: Complete StarterPack to FullSend
 
 **Learn DevOps, SRE and platform engineering by building, shipping and running one real service, in Python, from your laptop to Kubernetes.**
